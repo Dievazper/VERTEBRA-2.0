@@ -1,83 +1,125 @@
 <%- include('partials/header') %>
 
-    <header class="text-center mb-16 relative">
-        <div
-            class="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 opacity-40 blur-3xl rounded-full w-3/4 mx-auto h-32 top-0 transform -translate-y-12">
-        </div>
-        <h1 class="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-            The Future is <span
-                class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">Now.</span>
-        </h1>
-        <p class="text-xl text-slate-500 max-w-2xl mx-auto font-medium">Curated stories for the digital generation.</p>
-    </header>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        <% if(posts.length> 0) { %>
-            <% posts.forEach(post=> { %>
-                <article
-                    class="group relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 transform hover:-translate-y-2 border border-slate-100 h-full flex flex-col">
-                    <a href="/post/<%= post.slug %>" class="block overflow-hidden relative aspect-video">
+    <div class="container mx-auto px-6 py-12 flex flex-col lg:flex-row gap-12">
+        <!-- Main Content -->
+        <div class="lg:w-2/3">
+            <% if(posts.length> 0) { %>
+                <% posts.forEach(post=> { %>
+                    <article class="mb-16 border-b border-gray-100 pb-12 last:border-0">
                         <% if(post.image) { %>
-                            <img src="<%= post.image %>" alt="<%= post.title %>"
-                                class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-in-out">
-                            <% } else { %>
-                                <div
-                                    class="w-full h-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
-                                    <span class="text-white/50 text-6xl font-black">V</span>
-                                </div>
-                                <% } %>
-                                    <div
-                                        class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300">
-                                    </div>
-                    </a>
-
-                    <div class="p-6 md:p-8 flex flex-col flex-grow">
-                        <div class="flex items-center justify-between mb-4">
-                            <span
-                                class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-wider">Tech</span>
-                            <span class="text-xs text-slate-400 font-medium">
-                                <%= new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short' ,
-                                    day: 'numeric' }) %>
-                            </span>
-                        </div>
-
-                        <h2
-                            class="text-2xl font-bold text-slate-900 mb-3 leading-snug group-hover:text-indigo-600 transition-colors">
-                            <a href="/post/<%= post.slug %>">
-                                <span class="absolute inset-0"></span>
-                                <%= post.title %>
-                            </a>
-                        </h2>
-
-                        <p class="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-3">
-                            <%= post.body.substring(0, 120) %>...
-                        </p>
-
-                        <div
-                            class="mt-auto flex items-center text-indigo-600 font-semibold text-sm group-hover:translate-x-2 transition-transform duration-300">
-                            Read Story
-                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                            </svg>
-                        </div>
-                    </div>
-                </article>
-                <% }) %>
-                    <% } else { %>
-                        <div class="col-span-full py-24 text-center">
-                            <div class="inline-block p-6 rounded-full bg-slate-50 mb-4">
-                                <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                                    </path>
-                                </svg>
+                            <div class="mb-6 overflow-hidden rounded-lg">
+                                <a href="/post/<%= post.slug %>">
+                                    <img src="<%= post.image %>" alt="<%= post.title %>"
+                                        class="w-full h-auto hover:opacity-90 transition-opacity">
+                                </a>
                             </div>
-                            <h3 class="text-xl font-bold text-slate-900">No stories yet</h3>
-                            <p class="text-slate-500 mt-2">Check back soon for new content.</p>
-                        </div>
-                        <% } %>
+                            <% } %>
+
+                                <h2
+                                    class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 hover:text-[#2271b1] transition-colors font-display">
+                                    <a href="/post/<%= post.slug %>">
+                                        <%= post.title %>
+                                    </a>
+                                </h2>
+
+                                <div class="flex items-center text-sm text-gray-500 mb-6 font-medium">
+                                    <span class="mr-4">By <a href="#"
+                                            class="text-[#2271b1] hover:underline">Admin</a></span>
+                                    <span class="mr-4">&bull;</span>
+                                    <span>
+                                        <%= new Date(post.createdAt).toLocaleDateString(undefined, { year: 'numeric' ,
+                                            month: 'long' , day: 'numeric' }) %>
+                                    </span>
+                                    <span class="mr-4 ml-4">&bull;</span>
+                                    <a href="#" class="text-gray-500 hover:text-[#2271b1]">Uncategorized</a>
+                                </div>
+
+                                <div class="text-gray-600 leading-loose text-lg mb-6 font-serif">
+                                    <%= post.body.substring(0, 250) %>...
+                                </div>
+
+                                <a href="/post/<%= post.slug %>"
+                                    class="inline-block text-[#2271b1] font-bold uppercase tracking-wider text-sm hover:underline border-b-2 border-transparent hover:border-[#2271b1] transition-all pb-1">
+                                    Continue Reading &rarr;
+                                </a>
+                    </article>
+                    <% }) %>
+                        <% } else { %>
+                            <div class="py-20 text-center">
+                                <h3 class="text-2xl font-bold text-gray-900">Nothing Found</h3>
+                                <p class="text-gray-500 mt-2">Ready to publish your first post? Get started here.</p>
+                            </div>
+                            <% } %>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="lg:w-1/3 space-y-12">
+            <!-- Search -->
+            <div class="bg-gray-50 p-6 rounded border border-gray-100">
+                <h3 class="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">Search</h3>
+                <div class="flex">
+                    <input type="text" placeholder="Search..."
+                        class="w-full border border-gray-300 px-3 py-2 text-sm focus:border-[#2271b1] outline-none">
+                    <button class="bg-[#2271b1] text-white px-4 py-2 hover:bg-[#135e96] transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Posts -->
+            <div>
+                <h3
+                    class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-xs border-b-2 border-gray-100 pb-2 inline-block">
+                    Recent Posts</h3>
+                <ul class="space-y-4">
+                    <% if(posts.slice(0, 5).length> 0) { %>
+                        <% posts.slice(0, 5).forEach(post=> { %>
+                            <li class="flex items-start group">
+                                <% if(post.image) { %>
+                                    <div class="w-16 h-16 mr-4 flex-shrink-0 bg-gray-100">
+                                        <img src="<%= post.image %>"
+                                            class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                                    </div>
+                                    <% } %>
+                                        <div>
+                                            <h4
+                                                class="text-sm font-semibold text-gray-800 leading-snug group-hover:text-[#2271b1] transition-colors">
+                                                <a href="/post/<%= post.slug %>">
+                                                    <%= post.title %>
+                                                </a>
+                                            </h4>
+                                            <span class="text-xs text-gray-400 mt-1 block">
+                                                <%= new Date(post.createdAt).toLocaleDateString() %>
+                                            </span>
+                                        </div>
+                            </li>
+                            <% }) %>
+                                <% } else { %>
+                                    <li class="text-gray-400 text-sm">No recent posts.</li>
+                                    <% } %>
+                </ul>
+            </div>
+
+            <!-- Categories -->
+            <div>
+                <h3
+                    class="font-bold text-gray-900 mb-6 uppercase tracking-wider text-xs border-b-2 border-gray-100 pb-2 inline-block">
+                    Categories</h3>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li class="flex justify-between items-center"><a href="#"
+                            class="hover:text-[#2271b1]">Technology</a> <span
+                            class="bg-gray-100 rounded-full px-2 py-0.5 text-xs text-gray-500">3</span></li>
+                    <li class="flex justify-between items-center"><a href="#" class="hover:text-[#2271b1]">Design</a>
+                        <span class="bg-gray-100 rounded-full px-2 py-0.5 text-xs text-gray-500">1</span></li>
+                    <li class="flex justify-between items-center"><a href="#"
+                            class="hover:text-[#2271b1]">Uncategorized</a> <span
+                            class="bg-gray-100 rounded-full px-2 py-0.5 text-xs text-gray-500">0</span></li>
+                </ul>
+            </div>
+        </aside>
     </div>
 
     <%- include('partials/footer') %>

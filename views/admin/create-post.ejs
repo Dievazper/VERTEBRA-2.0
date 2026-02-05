@@ -1,51 +1,124 @@
-<%- include('../partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Create New Post</h1>
-            <a href="/admin/dashboard" class="text-gray-500 hover:text-gray-700 font-medium">Cancel</a>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Post &lsaquo; Vertebra 2.0</title>
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+    </style>
+</head>
 
-        <form action="/admin/create" method="POST"
-            class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-6">
-            <% if(typeof error !=='undefined' && error) { %>
-                <div class="text-red-500 mb-4 font-bold">
-                    <%= error %>
-                </div>
-                <% } %>
+<body class="bg-[#f0f0f1] text-[#3c434a]">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                            <input type="text" name="title" required
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Slug (URL)</label>
-                            <input type="text" name="slug" required
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors">
-                        </div>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <%- include('../partials/admin-sidebar') %>
+
+            <!-- Main Content -->
+            <div class="flex-grow flex flex-col">
+                <!-- Top Bar -->
+                <%- include('../partials/admin-header') %>
+
+                    <div class="p-4 md:p-8">
+                        <h1 class="text-2xl font-normal text-[#1d2327] mb-6">
+                            <%= typeof post !=='undefined' ? 'Edit Post' : 'Add New Post' %>
+                        </h1>
+
+                        <% if(typeof error !=='undefined' && error) { %>
+                            <div class="border-l-4 border-red-500 bg-white p-3 mb-4 shadow-sm">
+                                <%= error %>
+                            </div>
+                            <% } %>
+
+                                <form
+                                    action="<%= typeof post !== 'undefined' ? '/admin/edit/' + post._id + '?_method=PUT' : '/admin/create' %>"
+                                    method="POST" class="flex flex-col lg:flex-row gap-6">
+                                    <!-- Main Column -->
+                                    <div class="flex-grow space-y-4">
+                                        <input type="text" name="title"
+                                            value="<%= typeof post !== 'undefined' ? post.title : '' %>"
+                                            placeholder="Add title" required
+                                            class="w-full px-4 py-3 text-2xl font-semibold border border-[#c3c4c7] focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] shadow-sm outline-none">
+
+                                        <div class="bg-white border border-[#c3c4c7]">
+                                            <div
+                                                class="flex items-center px-2 py-1 border-b border-[#c3c4c7] bg-[#f0f0f1] text-xs space-x-2">
+                                                <button type="button"
+                                                    class="px-2 py-1 hover:bg-[#dcdcde] rounded font-bold">B</button>
+                                                <button type="button"
+                                                    class="px-2 py-1 hover:bg-[#dcdcde] rounded italic">I</button>
+                                                <button type="button"
+                                                    class="px-2 py-1 hover:bg-[#dcdcde] rounded underline">Link</button>
+                                            </div>
+                                            <textarea name="body" rows="20"
+                                                placeholder="Start writing or type / to choose a block" required
+                                                class="w-full p-4 outline-none resize-y min-h-[400px] text-base"><%= typeof post !== 'undefined' ? post.body : '' %></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sidebar Column -->
+                                    <div class="w-full lg:w-72 space-y-4 flex-shrink-0">
+                                        <!-- Publish Meta Box -->
+                                        <div class="bg-white border border-[#c3c4c7] shadow-sm">
+                                            <div class="px-4 py-3 border-b border-[#c3c4c7] font-semibold text-sm">
+                                                Publish</div>
+                                            <div class="p-4 text-sm space-y-3">
+                                                <div class="flex justify-between items-center text-gray-600">
+                                                    <span>Status:</span>
+                                                    <span class="font-bold text-gray-800">Draft</span>
+                                                </div>
+                                                <div class="flex justify-between items-center text-gray-600">
+                                                    <span>Visibility:</span>
+                                                    <span class="font-bold text-gray-800">Public</span>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="px-4 py-3 bg-[#f6f7f7] border-t border-[#c3c4c7] flex justify-between items-center">
+                                                <a href="#"
+                                                    class="text-[#b32d2e] text-sm hover:underline hover:text-red-700">Move
+                                                    to Trash</a>
+                                                <button type="submit"
+                                                    class="bg-[#2271b1] hover:bg-[#135e96] text-white font-semibold py-1.5 px-4 rounded text-sm transition-colors border border-[#2271b1]">
+                                                    <%= typeof post !=='undefined' ? 'Update' : 'Publish' %>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Permalink Meta Box -->
+                                        <div class="bg-white border border-[#c3c4c7] shadow-sm">
+                                            <div class="px-4 py-3 border-b border-[#c3c4c7] font-semibold text-sm">URL
+                                                Slug</div>
+                                            <div class="p-4">
+                                                <input type="text" name="slug"
+                                                    value="<%= typeof post !== 'undefined' ? post.slug : '' %>"
+                                                    class="w-full border border-[#c3c4c7] p-1 text-sm">
+                                            </div>
+                                        </div>
+
+                                        <!-- Featured Image Meta Box -->
+                                        <div class="bg-white border border-[#c3c4c7] shadow-sm">
+                                            <div class="px-4 py-3 border-b border-[#c3c4c7] font-semibold text-sm">
+                                                Featured Image</div>
+                                            <div class="p-4">
+                                                <input type="url" name="image"
+                                                    value="<%= typeof post !== 'undefined' ? post.image : '' %>"
+                                                    placeholder="https://..."
+                                                    class="w-full border border-[#c3c4c7] p-1 text-sm mb-2">
+                                                <a href="#" class="text-[#2271b1] underline text-sm">Set featured
+                                                    image</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Featured Image URL</label>
-                        <input type="url" name="image" placeholder="https://example.com/image.jpg"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                        <textarea name="body" rows="12" required
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors font-mono text-sm"></textarea>
-                    </div>
-
-                    <div class="flex justify-end pt-4">
-                        <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
-                            Publish Post
-                        </button>
-                    </div>
-        </form>
+            </div>
     </div>
 
-    <%- include('../partials/footer') %>
+</body>
+
+</html>
