@@ -2,12 +2,25 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const Post = require('../models/Post');
+const User = require('../models/User');
 
-// Hardcoded Admin Credentials (in production, use DB)
-const adminUser = {
-    username: 'admin',
-    passwordHash: '$2b$10$sbcD8jyAohespXTeGdd8guutLJv2zGC.tThFNOLjbHy65fulNpd0C' // 'admin'
-};
+// --- INITIAL SEED ---
+// Ensure one admin exists so the user isn't locked out.
+(async () => {
+    try {
+        const count = await User.countDocuments();
+        if (count === 0) {
+            const hashedPassword = await bcrypt.hash('admin123', 10);
+            await User.create({
+                username: 'admin',
+                password: hashedPassword
+            });
+            console.log('Seed: Created initial admin user (admin / admin123)');
+        }
+    } catch (e) {
+        console.error('Seed: Error checking/creating initial user', e);
+    }
+})();
 
 // Authentication Middleware
 const isAdmin = (req, res, next) => {
@@ -25,19 +38,27 @@ router.get('/login', (req, res) => {
     res.render('admin/login', { error: null });
 });
 
-// POST Login Logic
+// POST Login Logic (DB Backed)
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    if (username === adminUser.username) {
-        const match = await bcrypt.compare(password, adminUser.passwordHash);
-        if (match) {
-            req.session.user = { username: username };
-            return res.redirect('/admin/dashboard');
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.render('admin/login', { error: 'Invalid credentials' });
         }
-    }
 
-    res.render('admin/login', { error: 'Invalid credentials' });
+        const match = await bcrypt.compare(password, user.password);
+        if (match) {
+            req.session.user = { id: user._id, username: user.username };
+            return res.redirect('/admin/dashboard');
+        } else {
+            return res.render('admin/login', { error: 'Invalid credentials' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.render('admin/login', { error: 'Server error' });
+    }
 });
 
 // GET Logout
@@ -58,6 +79,8 @@ router.get('/dashboard', isAdmin, async (req, res) => {
     }
 });
 
+// --- POST MANAGEMENT ---
+
 // GET Create Post Page
 router.get('/create', isAdmin, (req, res) => {
     res.render('admin/create-post');
@@ -65,14 +88,8 @@ router.get('/create', isAdmin, (req, res) => {
 
 // POST Create Post
 router.post('/create', isAdmin, async (req, res) => {
-    const { title, slug, body, image, category } = req.body;
-    const newPost = new Post({
-        title,
-        slug,
-        body,
-        image,
-        // category // Schema update might be needed if category is strictly required by prompt
-    });
+    const { title, slug, body, image } = req.body;
+    const newPost = new Post({ title, slug, body, image });
 
     try {
         await newPost.save();
@@ -99,13 +116,7 @@ router.get('/edit/:id', isAdmin, async (req, res) => {
 router.put('/edit/:id', isAdmin, async (req, res) => {
     try {
         const { title, slug, body, image } = req.body;
-        await Post.findByIdAndUpdate(req.params.id, {
-            title,
-            slug,
-            body,
-            image,
-            // category
-        });
+        await Post.findByIdAndUpdate(req.params.id, { title, slug, body, image });
         res.redirect('/admin/dashboard');
     } catch (err) {
         console.error(err);
@@ -121,6 +132,61 @@ router.delete('/delete/:id', isAdmin, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.redirect('/admin/dashboard');
+    }
+});
+
+// --- USER MANAGEMENT ---
+
+// GET List Users
+router.get('/users', isAdmin, async (req, res) => {
+    try {
+        const users = await User.find().sort({ createdAt: -1 });
+        res.render('admin/users', { users });
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/dashboard');
+    }
+});
+
+// GET Create User Page
+router.get('/users/create', isAdmin, (req, res) => {
+    res.render('admin/create-user');
+});
+
+// POST Create User
+router.post('/users/create', isAdmin, async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const existing = await User.findOne({ username });
+        if (existing) {
+            return res.send("User already exists");
+        }
+
+        // Model pre-save hook handles hashing
+        const newUser = new User({ username, password });
+        await newUser.save();
+        res.redirect('/admin/users');
+    } catch (err) {
+        console.error(err);
+        res.send("Error creating user");
+    }
+});
+
+// DELETE User
+router.delete('/users/delete/:id', isAdmin, async (req, res) => {
+    try {
+        // Prevent deleting self? (Optional but good practice)
+        if (req.session.user.id === req.params.id) {
+            // For simplicity, just redirect or show error. 
+            // Ideally we shouldn't allow deleting self to prevent lockout if only one admin.
+            return res.redirect('/admin/users');
+        }
+
+        await User.findByIdAndDelete(req.params.id);
+        res.redirect('/admin/users');
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/users');
     }
 });
 
